@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^php -m$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

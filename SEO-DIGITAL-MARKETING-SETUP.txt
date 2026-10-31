@@ -1,0 +1,29 @@
+COLLEGEKHOJ SEO & DIGITAL MARKETING LAUNCH CHECKLIST
+
+Already included in this static website:
+- Responsive mobile-first refinements and viewport configuration
+- Page title and meta description focused on online degree search intent
+- Canonical URL, robots directive, Open Graph and Twitter social metadata
+- Organization, WebSite, WebPage and FAQPage JSON-LD structured data
+- robots.txt and sitemap.xml
+- Semantic headings, accessible labels, image alt text and keyboard focus styles
+- Natural on-page popular-search links for Online MBA, MCA, BBA, BCA, BCom, MCom, eligibility, universities and admission guidance
+- Footer admission disclaimer
+
+IMPORTANT: Search tags are navigation/content hints, not a guarantee of ranking. Google does not use the meta keywords tag for ranking; avoid keyword stuffing. No website can guarantee top search placement.
+
+BEFORE LAUNCH:
+1. Confirm the site is published at https://collegekhoj.co.in/ and HTTPS works.
+2. Create/verify Google Search Console and submit https://collegekhoj.co.in/sitemap.xml.
+3. Set up Google Analytics 4 only after implementing an appropriate privacy notice and consent choices where required.
+4. Add and verify the website in Bing Webmaster Tools; submit the sitemap.
+5. Connect the lead form to a real CRM, email or approved WhatsApp flow. Current form is a demo and does not transmit/store leads.
+6. Publish a genuine Privacy Policy and Terms/Disclaimer page, and add their links to the footer before collecting personal data or running ads.
+7. Add real contact details, business address if appropriate, social profiles and a working support channel.
+8. Create separate, original landing pages for each university and course (for example Online MBA, Online MCA, Online BBA), with unique title, description, course details, fees/eligibility source links and FAQs. Update sitemap.xml when those pages are live.
+9. Verify course names, eligibility, fees and current-session availability with each university before advertising.
+10. Test mobile layouts and Core Web Vitals using PageSpeed Insights, and validate JSON-LD using Google's Rich Results Test / Schema Markup Validator.
+11. For paid digital campaigns, configure conversion tracking only after consent/privacy setup; use campaign-specific UTM tags and measure qualified leads, not just clicks.
+
+POPULAR SEARCH PHRASES TO USE NATURALLY IN FUTURE COURSE PAGES:
+online degree courses in India; online MBA in India; online MBA admission; online MCA; online BBA; online BCA; online BCom; online MCom; online degree after 12th; online postgraduate courses; online university courses; online degree eligibility; online course fees; online admission guidance; SMU Online courses; MUJ Online courses; Integral University Online courses; Mangalayatan University Online courses.
