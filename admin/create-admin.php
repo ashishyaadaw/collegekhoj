@@ -6,9 +6,9 @@ if (PHP_SAPI !== 'cli') {
     exit;
 }
 require dirname(__DIR__) . '/db.php';
-$email = filter_var(getenv('ADMIN_EMAIL') ?: '', FILTER_VALIDATE_EMAIL);
-$password = getenv('ADMIN_PASSWORD') ?: '';
-$name = trim(getenv('ADMIN_NAME') ?: 'Site Administrator');
+$email = filter_var(env('ADMIN_EMAIL') ?: '', FILTER_VALIDATE_EMAIL);
+$password = env('ADMIN_PASSWORD') ?: '';
+$name = trim(env('ADMIN_NAME') ?: 'Site Administrator');
 if (!$email || strlen($password) < 12) {
     fwrite(STDERR, "Set ADMIN_EMAIL to a valid email and ADMIN_PASSWORD to at least 12 characters.\n");
     exit(1);

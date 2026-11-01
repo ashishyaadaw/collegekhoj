@@ -81,7 +81,7 @@ function require_user(): void
 
 function app_url(string $path = ''): string
 {
-    $configured = getenv('APP_BASE_PATH');
+    $configured = env('APP_BASE_PATH');
     if ($configured !== false) {
         $base = '/' . trim(str_replace('\\', '/', $configured), '/');
         if ($base === '/') {
@@ -231,7 +231,7 @@ function institution_initials(string $name): string
 
 function contact_email(): string
 {
-    $configured = getenv('CONTACT_EMAIL');
+    $configured = env('CONTACT_EMAIL');
     return $configured !== false && filter_var($configured, FILTER_VALIDATE_EMAIL) ? $configured : 'help@collegekhoj.co.in';
 }
 

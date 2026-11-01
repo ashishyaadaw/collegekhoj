@@ -1,2 +1,25 @@
+# Apache-only directives (OpenLiteSpeed/CyberPanel ignores these; the rewrite rules below cover both).
 DirectoryIndex index.php index.html
 Options -Indexes
+
+<FilesMatch "^\.env">
+    Require all denied
+</FilesMatch>
+
+# Rewrite rules work on Apache and OpenLiteSpeed. After editing this file on
+# CyberPanel, restart LiteSpeed so the change is picked up.
+RewriteEngine On
+
+# Serve the PHP home page rather than the legacy static index.html.
+RewriteRule ^$ index.php [L]
+
+# Block dotfiles (.env, .git, .htaccess...) except ACME/SSL validation paths.
+RewriteRule (^|/)\.(?!well-known/) - [F,L]
+
+# Block server-side files that should never be downloaded.
+RewriteRule ^(schema\.sql|INSTALL\.md|README\.md|SEO-DIGITAL-MARKETING-SETUP\.txt)$ - [F,L,NC]
+RewriteRule ^(includes|admin/create-admin(-account)?\.php) - [F,L,NC]
+RewriteRule ^db\.php$ - [F,L,NC]
+
+# Never execute scripts from the uploads folder.
+RewriteRule ^assets/uploads/.*\.(php\d*|phtml|phar)$ - [F,L,NC]

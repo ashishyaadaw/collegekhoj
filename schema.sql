@@ -1,5 +1,6 @@
-CREATE DATABASE IF NOT EXISTS collegekhoj CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE collegekhoj;
+-- Import into an existing, empty database (create it first in phpMyAdmin or your hosting panel).
+SET NAMES utf8mb4;
+
 
 CREATE TABLE users (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -9,7 +10,7 @@ CREATE TABLE users (
   role ENUM('admin','user') NOT NULL DEFAULT 'user',
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE universities (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -27,7 +28,7 @@ CREATE TABLE universities (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_universities_active_featured (is_active, featured, name)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE colleges (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -59,14 +60,14 @@ CREATE TABLE colleges (
   INDEX idx_colleges_listing (is_active, featured, state, city),
   INDEX idx_colleges_rating (rating),
   INDEX idx_colleges_fees (fees_min, fees_max)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE course_categories (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NOT NULL UNIQUE,
   slug VARCHAR(120) NOT NULL UNIQUE,
   sort_order SMALLINT NOT NULL DEFAULT 0
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE courses (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -88,7 +89,7 @@ CREATE TABLE courses (
   CONSTRAINT fk_courses_college FOREIGN KEY (college_id) REFERENCES colleges(id) ON DELETE SET NULL,
   INDEX idx_courses_navigation (is_active, category_id, name),
   INDEX idx_courses_association (university_id, college_id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE exams (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -100,7 +101,7 @@ CREATE TABLE exams (
   description TEXT NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1,
   INDEX idx_exams_date (is_active, exam_date)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE college_exams (
   college_id BIGINT UNSIGNED NOT NULL,
@@ -109,7 +110,7 @@ CREATE TABLE college_exams (
   CONSTRAINT fk_college_exams_college FOREIGN KEY (college_id) REFERENCES colleges(id) ON DELETE CASCADE,
   CONSTRAINT fk_college_exams_exam FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE,
   INDEX idx_college_exams_exam (exam_id, college_id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE reviews (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -126,7 +127,7 @@ CREATE TABLE reviews (
   CONSTRAINT fk_reviews_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT fk_reviews_college FOREIGN KEY (college_id) REFERENCES colleges(id) ON DELETE CASCADE,
   INDEX idx_reviews_college_status (college_id, status, created_at)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE college_questions (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -140,7 +141,7 @@ CREATE TABLE college_questions (
   CONSTRAINT fk_questions_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   CONSTRAINT fk_questions_college FOREIGN KEY (college_id) REFERENCES colleges(id) ON DELETE CASCADE,
   INDEX idx_questions_college_status (college_id, status, created_at)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE cms_pages (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -154,7 +155,7 @@ CREATE TABLE cms_pages (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_cms_pages_status_slug (status, slug)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE tags_manager (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -167,7 +168,7 @@ CREATE TABLE tags_manager (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_tags_injection (is_active, target_type, target_value)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE home_tags (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -179,7 +180,7 @@ CREATE TABLE home_tags (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_home_tags_display (is_active, group_name, sort_order)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO course_categories (name, slug, sort_order) VALUES
 ('Management', 'management', 1),
