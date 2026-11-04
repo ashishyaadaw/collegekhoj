@@ -3,17 +3,17 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/includes/bootstrap.php';
 require_admin();
 $pdo = db();
+ensure_leads_table($pdo);
 $count = static fn (string $sql): int => (int) $pdo->query($sql)->fetchColumn();
 $stats = [
+    ['New leads', $count("SELECT COUNT(*) FROM leads WHERE status = 'new'"), 'leads.php?status=new', 'inbox', 'rose'],
+    ['Leads this week', $count('SELECT COUNT(*) FROM leads WHERE created_at >= CURDATE() - INTERVAL 6 DAY'), 'leads.php', 'chat', 'blue'],
     ['Active universities', $count('SELECT COUNT(*) FROM universities WHERE is_active = 1'), 'universities.php', 'university', 'amber'],
-    ['Active colleges', $count('SELECT COUNT(*) FROM colleges WHERE is_active = 1'), 'colleges.php', 'college', 'teal'],
     ['Active courses', $count('SELECT COUNT(*) FROM courses WHERE is_active = 1'), 'courses.php', 'book', 'indigo'],
     ['Active exams', $count('SELECT COUNT(*) FROM exams WHERE is_active = 1'), 'exams.php', 'exam', 'rose'],
     ['Published pages', $count("SELECT COUNT(*) FROM cms_pages WHERE status = 'published'"), 'pages.php', 'page', 'violet'],
     ['Active tracking tags', $count('SELECT COUNT(*) FROM tags_manager WHERE is_active = 1'), 'tags.php', 'tag', 'green'],
-    ['Pending reviews', $count("SELECT COUNT(*) FROM reviews WHERE status = 'pending'"), 'reviews.php', 'star', 'gold'],
-    ['Pending questions', $count("SELECT COUNT(*) FROM college_questions WHERE status = 'pending'"), 'reviews.php', 'chat', 'blue'],
-    ['Registered students', $count("SELECT COUNT(*) FROM users WHERE role = 'user'"), null, 'users', 'navy'],
+    ['Total leads', $count('SELECT COUNT(*) FROM leads'), 'leads.php', 'users', 'navy'],
 ];
 $hour = (int) date('G');
 $greeting = $hour < 12 ? 'Good morning' : ($hour < 17 ? 'Good afternoon' : 'Good evening');
@@ -38,7 +38,7 @@ require __DIR__ . '/_nav.php';
 
 <div class="adm-section-title">
   <h2>Global Overview</h2>
-  <p>Catalog content, moderation queue and site configuration at a glance.</p>
+  <p>Counselling leads, catalog content and site configuration at a glance.</p>
 </div>
 <section class="adm-stats">
   <?php foreach ($stats as [$label, $value, $link, $icon, $tone]): ?>

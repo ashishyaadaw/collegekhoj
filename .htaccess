@@ -13,12 +13,20 @@ RewriteEngine On
 # Serve the PHP home page rather than the legacy static index.html.
 RewriteRule ^$ index.php [L]
 
+# The college directory, comparison, reviews and Q&A were removed: send old links to the home page.
+RewriteCond %{REQUEST_URI} ^(.*/)(colleges|college-detail|compare|review|question)\.php$ [NC]
+RewriteRule ^ %1? [R=301,L]
+
+# Course and university detail pages: /courses/online-mba, /universities/some-university
+RewriteRule ^courses/([A-Za-z0-9-]+)/?$ course.php?slug=$1 [L,QSA]
+RewriteRule ^universities/([A-Za-z0-9-]+)/?$ university.php?slug=$1 [L,QSA]
+
 # Block dotfiles (.env, .git, .htaccess...) except ACME/SSL validation paths.
 RewriteRule (^|/)\.(?!well-known/) - [F,L]
 
 # Block server-side files that should never be downloaded.
 RewriteRule ^(schema\.sql|INSTALL\.md|README\.md|SEO-DIGITAL-MARKETING-SETUP\.txt)$ - [F,L,NC]
-RewriteRule ^(includes|admin/create-admin(-account)?\.php) - [F,L,NC]
+RewriteRule ^(includes|migrations|admin/create-admin(-account)?\.php) - [F,L,NC]
 RewriteRule ^db\.php$ - [F,L,NC]
 
 # Never execute scripts from the uploads folder.

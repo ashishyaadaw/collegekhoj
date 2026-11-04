@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'delete' && $id) {
         $query = $pdo->prepare('DELETE FROM universities WHERE id = :id');
         $query->execute(['id' => $id]);
-        flash('University deleted. Associated college links were cleared.');
+        flash('University deleted. Associated course links were cleared.');
         header('Location: ' . app_url('/admin/universities.php'));
         exit;
     }
@@ -65,7 +65,7 @@ if ($editId) {
     $query->execute(['id' => $editId]);
     $edit = $query->fetch() ?: null;
 }
-$universities = $pdo->query('SELECT * FROM universities ORDER BY name')->fetchAll();
+$universities = $pdo->query('SELECT u.*, (SELECT COUNT(*) FROM course_universities cu WHERE cu.university_id = u.id) AS course_count FROM universities u ORDER BY u.name')->fetchAll();
 $adminTitle = 'Manage universities';
 require __DIR__ . '/_nav.php';
 ?>
@@ -80,8 +80,8 @@ require __DIR__ . '/_nav.php';
 <label><input type="checkbox" name="featured" style="width:auto" <?= !empty($edit['featured']) ? 'checked' : '' ?>> Featured</label>
 <label><input type="checkbox" name="is_active" style="width:auto" <?= !isset($edit['is_active']) || $edit['is_active'] ? 'checked' : '' ?>> Published</label>
 <button class="button" type="submit">Save university</button><?php if ($edit): ?> <a class="button button-light" href="<?= e(app_url('/admin/universities.php')) ?>">Cancel</a><?php endif; ?></form></section>
-<section class="section"><h2>University directory</h2><div class="table-wrap card"><table><thead><tr><th>University</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead><tbody>
-<?php foreach ($universities as $university): ?><tr><td><?= e($university['name']) ?></td><td><?= e($university['location'] ?? '') ?></td><td><?= $university['is_active'] ? 'Published' : 'Hidden' ?><?= $university['featured'] ? ' · Featured' : '' ?></td><td><a class="text-link" href="<?= e(app_url('/admin/universities.php?edit=' . (int) $university['id'])) ?>">Edit</a>
+<section class="section"><h2>University directory</h2><div class="table-wrap card"><table><thead><tr><th>University</th><th>Location</th><th>Courses</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+<?php foreach ($universities as $university): ?><tr><td><?= e($university['name']) ?></td><td><?= e($university['location'] ?? '') ?></td><td><?= (int) $university['course_count'] ?></td><td><?= $university['is_active'] ? 'Published' : 'Hidden' ?><?= $university['featured'] ? ' · Featured' : '' ?></td><td><a class="text-link" href="<?= e(app_url('/admin/universities.php?edit=' . (int) $university['id'])) ?>">Edit</a>
 <form class="inline-form" method="post" onsubmit="return confirm('Delete this university?')"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?= (int) $university['id'] ?>"><button type="submit">Delete</button></form></td></tr><?php endforeach; ?>
 </tbody></table></div></section>
 <?php require __DIR__ . '/_end.php'; ?>

@@ -65,10 +65,61 @@ function verify_csrf(): void
 
 function require_admin(): void
 {
-    if (($_SESSION['user_role'] ?? '') !== 'admin') {
-        header('Location: ' . app_url('/admin/login.php'));
-        exit;
+    if (($_SESSION['user_role'] ?? '') === 'admin') {
+        // Re-checked on every request so a deactivated or deleted admin is signed out immediately.
+        $statement = db()->prepare("SELECT name FROM users WHERE id = :id AND role = 'admin' AND is_active = 1");
+        $statement->execute(['id' => (int) ($_SESSION['user_id'] ?? 0)]);
+        $name = $statement->fetchColumn();
+        if ($name !== false) {
+            $_SESSION['user_name'] = $name;
+            return;
+        }
+        $_SESSION = [];
+        session_regenerate_id(true);
     }
+    header('Location: ' . app_url('/admin/login.php'));
+    exit;
+}
+
+function active_admin_count(PDO $pdo): int
+{
+    return (int) $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active = 1")->fetchColumn();
+}
+
+/** Validation errors for a new admin account; empty when the details are acceptable. */
+function admin_account_errors(string $name, string $email, string $password, string $confirmation): array
+{
+    $errors = [];
+    if ($name === '' || mb_strlen($name) > 120) {
+        $errors[] = 'Enter a name of up to 120 characters.';
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 190) {
+        $errors[] = 'Enter a valid email address.';
+    }
+    return array_merge($errors, admin_password_errors($password, $confirmation));
+}
+
+function admin_password_errors(string $password, string $confirmation): array
+{
+    if (strlen($password) < 12 || strlen($password) > 200) {
+        return ['The password must be between 12 and 200 characters.'];
+    }
+    return hash_equals($password, $confirmation) ? [] : ['The passwords do not match.'];
+}
+
+/** Creates an active admin and returns its id, or null when the email is already registered. */
+function create_admin_account(PDO $pdo, string $name, string $email, string $password): ?int
+{
+    try {
+        $pdo->prepare("INSERT INTO users (name, email, password_hash, role, is_active) VALUES (:name, :email, :hash, 'admin', 1)")
+            ->execute(['name' => $name, 'email' => $email, 'hash' => password_hash($password, PASSWORD_DEFAULT)]);
+    } catch (PDOException $exception) {
+        if ($exception->getCode() === '23000') {
+            return null;
+        }
+        throw $exception;
+    }
+    return (int) $pdo->lastInsertId();
 }
 
 function require_user(): void
@@ -164,7 +215,7 @@ function slugify(string $value): string
 
 function unique_slug(string $table, string $value, ?int $excludeId = null): string
 {
-    $tables = ['colleges' => 'slug', 'universities' => 'slug', 'courses' => 'slug', 'cms_pages' => 'slug'];
+    $tables = ['universities' => 'slug', 'courses' => 'slug', 'cms_pages' => 'slug'];
     if (!isset($tables[$table])) {
         throw new InvalidArgumentException('Unsupported slug table.');
     }
@@ -204,7 +255,7 @@ function take_flash(): ?array
 
 function course_icon(string $courseName): string
 {
-    // Same icon set as the static index.html, matched on the programme name.
+    // Icons matched on the programme name.
     $icons = [
         '/journalism|mass comm/i' => '📰', '/political/i' => '🏛️', '/sociology/i' => '🧠', '/economics/i' => '📈',
         '/english/i' => '📖', '/math/i' => '🔬', '/\bMBA\b/i' => '📊', '/\bMCA\b/i' => '💻', '/\bBBA\b/i' => '🚀',
@@ -240,3 +291,8 @@ function contact_email_link(string $class = 'text-link'): string
     $email = e(contact_email());
     return '<a class="' . e($class) . '" href="mailto:' . $email . '">' . $email . '</a>';
 }
+
+require_once __DIR__ . '/counselling.php';
+require_once __DIR__ . '/home_tags.php';
+require_once __DIR__ . '/navigation.php';
+require_once __DIR__ . '/catalog.php';

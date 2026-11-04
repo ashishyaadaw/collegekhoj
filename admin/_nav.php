@@ -24,6 +24,8 @@ if (!function_exists('admin_icon')) {
             'logout' => '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
             'menu' => '<path d="M3 6h18M3 12h18M3 18h18"/>',
             'user' => '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+            'inbox' => '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1Z"/>',
+            'settings' => '<path d="M12.2 2h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/>',
             'clock' => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
         ];
         return '<svg class="ai" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . ($paths[$name] ?? '') . '</svg>';
@@ -41,16 +43,19 @@ $adminInitials = $adminInitials ?: 'A';
 $adminScript = basename($_SERVER['SCRIPT_NAME'] ?? 'index.php');
 $adminMenu = [
     ['index.php', 'Dashboard', 'dashboard', 'blue'],
+    ['leads.php', 'Counselling leads', 'inbox', 'rose'],
     null,
     ['universities.php', 'Universities', 'university', 'amber'],
-    ['colleges.php', 'Colleges', 'college', 'teal'],
     ['courses.php', 'Courses', 'book', 'indigo'],
     ['exams.php', 'Exams', 'exam', 'rose'],
     null,
-    ['reviews.php', 'Reviews &amp; Q&amp;A', 'star', 'gold'],
+    ['settings.php', 'Counselling &amp; widgets', 'settings', 'gold'],
     ['pages.php', 'Pages &amp; SEO', 'page', 'violet'],
+    ['nav-links.php', 'Header &ldquo;More&rdquo; menu', 'menu', 'blue'],
     ['home-tags.php', 'Home page tags', 'search', 'teal'],
     ['tags.php', 'Tag manager', 'tag', 'green'],
+    null,
+    ['users.php', 'Administrators', 'users', 'violet'],
 ];
 ?>
 <!doctype html>
@@ -64,10 +69,10 @@ $adminMenu = [
 <header class="adm-topbar">
   <button class="adm-icon-btn adm-menu-toggle" type="button" aria-label="Toggle menu" aria-controls="adm-sidebar" aria-expanded="false"><?= admin_icon('menu') ?></button>
   <a class="adm-brand" href="<?= e(app_url('/admin/index.php')) ?>"><span class="adm-brand-mark"><img src="<?= e(app_url('/assets/collegekhoj-logo.png')) ?>" alt=""></span><span>CMS &ndash; Collegekhoj</span></a>
-  <label class="adm-search"><?= admin_icon('search') ?><input type="search" id="adm-search" placeholder="Search menu (colleges, exams, pages, tags&hellip;)" autocomplete="off" aria-label="Search admin menu"><kbd>CTRL</kbd><kbd>K</kbd></label>
+  <label class="adm-search"><?= admin_icon('search') ?><input type="search" id="adm-search" placeholder="Search menu (leads, courses, pages, tags&hellip;)" autocomplete="off" aria-label="Search admin menu"><kbd>CTRL</kbd><kbd>K</kbd></label>
   <div class="adm-top-actions">
     <a class="adm-icon-btn" href="<?= e(app_url('/')) ?>" target="_blank" rel="noopener" title="View public site" aria-label="View public site"><?= admin_icon('external') ?></a>
-    <a class="adm-icon-btn" href="<?= e(app_url('/admin/reviews.php')) ?>" title="Reviews &amp; Q&amp;A" aria-label="Reviews and Q&amp;A"><?= admin_icon('chat') ?></a>
+    <a class="adm-icon-btn" href="<?= e(app_url('/admin/leads.php')) ?>" title="Counselling leads" aria-label="Counselling leads"><?= admin_icon('inbox') ?></a>
     <span class="adm-avatar" title="<?= e($adminName) ?>"><?= e($adminInitials) ?></span>
   </div>
 </header>

@@ -20,7 +20,7 @@ function ensure_home_tags_table(PDO $pdo): void
     );
 }
 
-/** Internal links are stored as site-relative paths ("/colleges.php?course=1"); external links as full http(s) URLs. */
+/** Internal links are stored as site-relative paths ("/courses/online-mba"); external links as full http(s) URLs. */
 function is_valid_home_tag_url(string $url): bool
 {
     if (str_starts_with($url, '/') && !str_starts_with($url, '//')) {
@@ -60,20 +60,14 @@ function home_tag_suggestions(PDO $pdo): array
     $suggestions = [];
     $add = static function (string $group, int $groupOrder, array $rows, callable $build) use (&$suggestions): void {
         foreach (array_values($rows) as $index => $row) {
-            [$label, $query] = $build($row);
-            $suggestions[] = ['group_name' => $group, 'label' => $label, 'url' => '/colleges.php?' . http_build_query($query), 'sort_order' => $groupOrder + ($index + 1) * 10];
+            [$label, $url] = $build($row);
+            $suggestions[] = ['group_name' => $group, 'label' => $label, 'url' => $url, 'sort_order' => $groupOrder + ($index + 1) * 10];
         }
     };
-    $add('Popular courses', 1000, $pdo->query('SELECT id, name FROM courses WHERE is_active = 1 ORDER BY name')->fetchAll(),
-        static fn (array $r): array => [course_icon($r['name']) . ' ' . $r['name'], ['course' => (int) $r['id']]]);
-    $add('Streams', 2000, $pdo->query('SELECT DISTINCT cc.id, cc.name, cc.sort_order FROM course_categories cc JOIN courses c ON c.category_id = cc.id AND c.is_active = 1 ORDER BY cc.sort_order, cc.name')->fetchAll(),
-        static fn (array $r): array => [$r['name'] . ' colleges', ['category' => (int) $r['id']]]);
-    $add('Universities', 3000, $pdo->query('SELECT name, slug FROM universities WHERE is_active = 1 ORDER BY featured DESC, name')->fetchAll(),
-        static fn (array $r): array => [$r['name'], ['university' => $r['slug']]]);
-    $add('Colleges by location', 4000, $pdo->query("SELECT place FROM (SELECT city AS place FROM colleges WHERE is_active = 1 AND city <> '' UNION SELECT state FROM colleges WHERE is_active = 1 AND state <> '') places WHERE place IS NOT NULL ORDER BY place")->fetchAll(),
-        static fn (array $r): array => ['Colleges in ' . $r['place'], ['city' => $r['place']]]);
-    $add('Entrance exams', 5000, $pdo->query('SELECT DISTINCT e.id, e.name FROM exams e JOIN college_exams ce ON ce.exam_id = e.id JOIN colleges c ON c.id = ce.college_id AND c.is_active = 1 WHERE e.is_active = 1 ORDER BY e.name')->fetchAll(),
-        static fn (array $r): array => [$r['name'] . ' colleges', ['exam' => (int) $r['id']]]);
+    $add('Popular courses', 1000, $pdo->query('SELECT name, slug FROM courses WHERE is_active = 1 ORDER BY name')->fetchAll(),
+        static fn (array $r): array => [course_icon($r['name']) . ' ' . $r['name'], '/courses/' . rawurlencode($r['slug'])]);
+    $add('Universities', 2000, $pdo->query('SELECT name, slug FROM universities WHERE is_active = 1 ORDER BY featured DESC, name')->fetchAll(),
+        static fn (array $r): array => [$r['name'], '/universities/' . rawurlencode($r['slug'])]);
     return $suggestions;
 }
 

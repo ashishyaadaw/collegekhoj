@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__) . '/includes/bootstrap.php';
-require dirname(__DIR__) . '/includes/home_tags.php';
+require_once dirname(__DIR__) . '/includes/home_tags.php';
 require_admin();
 $pdo = db();
 ensure_home_tags_table($pdo);
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (mb_strlen($group) > 80 || mb_strlen($label) > 120 || strlen($url) > 500) {
             $error = 'Group (80), label (120) or link (500) is too long.';
         } elseif (!is_valid_home_tag_url($url)) {
-            $error = 'Link must be a site path starting with / (for example /colleges.php?city=Jaipur) or a full http(s) URL.';
+            $error = 'Link must be a site path starting with / (for example /courses/online-mba) or a full http(s) URL.';
         } else {
             $data = [
                 'group_name' => $group, 'label' => $label, 'url' => $url,
@@ -81,7 +81,7 @@ require __DIR__ . '/_nav.php';
 <div class="form-grid">
   <label>Group *<input name="group_name" required maxlength="80" list="home-tag-groups" value="<?= e($form['group_name'] ?? '') ?>" placeholder="e.g. Popular courses"></label>
   <label>Label *<input name="label" required maxlength="120" value="<?= e($form['label'] ?? '') ?>" placeholder="e.g. Online MBA"></label>
-  <label class="full">Link *<input name="url" required maxlength="500" value="<?= e($form['url'] ?? '') ?>" placeholder="/colleges.php?city=Jaipur or https://example.com"></label>
+  <label class="full">Link *<input name="url" required maxlength="500" value="<?= e($form['url'] ?? '') ?>" placeholder="/courses/online-mba or https://example.com"></label>
   <label>Sort order<input type="number" name="sort_order" value="<?= e((string) ($form['sort_order'] ?? $nextSortOrder)) ?>"></label>
 </div>
 <datalist id="home-tag-groups"><?php foreach ($groupNames as $groupName): ?><option value="<?= e($groupName) ?>"><?php endforeach; ?></datalist>
@@ -90,7 +90,7 @@ require __DIR__ . '/_nav.php';
 </form></section>
 <section class="section">
   <div class="section-heading"><h2 style="margin:0">Tags (<?= count($tags) ?>)</h2>
-    <form method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="suggest"><button class="button button-light" type="submit" title="Adds a tag for each course, stream, university, location and linked exam that does not have one yet">Add suggested tags from catalog</button></form>
+    <form method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="suggest"><button class="button button-light" type="submit" title="Adds a tag linking to each course and university page that does not have one yet">Add suggested tags from catalog</button></form>
   </div>
   <div class="table-wrap card"><table><thead><tr><th>Group</th><th>Label</th><th>Link</th><th>Order</th><th>Status</th><th>Actions</th></tr></thead><tbody>
   <?php foreach ($tags as $tag): ?><tr>

@@ -7,7 +7,30 @@ if (($_SESSION['user_role'] ?? '') === 'admin') {
     exit;
 }
 $message = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// First run: until an active admin exists, this page creates one instead of signing in.
+$setupMode = active_admin_count(db()) === 0;
+if ($setupMode && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    verify_csrf();
+    $name = trim(request_value($_POST, 'name'));
+    $email = trim(request_value($_POST, 'email'));
+    $password = request_value($_POST, 'password');
+    $errors = admin_account_errors($name, $email, $password, request_value($_POST, 'password_confirm'));
+    if (!$errors && active_admin_count(db()) > 0) {
+        $errors[] = 'An administrator account was just created. Sign in instead.';
+        $setupMode = false;
+    }
+    $adminId = $errors ? null : create_admin_account(db(), $name, $email, $password);
+    if ($adminId) {
+        session_regenerate_id(true);
+        $_SESSION['user_id'] = $adminId;
+        $_SESSION['user_name'] = $name;
+        $_SESSION['user_role'] = 'admin';
+        flash('Administrator account created. Welcome, ' . $name . '!');
+        header('Location: ' . app_url('/admin/index.php'));
+        exit;
+    }
+    $message = $errors ? implode(' ', $errors) : 'That email is already registered. Use a different email address.';
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
     $email = filter_var(trim(request_value($_POST, 'email')), FILTER_VALIDATE_EMAIL);
     $password = request_value($_POST, 'password');
@@ -47,15 +70,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="adm-auth-head">
     <a class="adm-brand-mark adm-auth-logo" href="<?= e(app_url('/')) ?>"><img src="<?= e(app_url('/assets/collegekhoj-logo.png')) ?>" alt="Collegekhoj"></a>
     <p>CMS &ndash; Collegekhoj</p>
-    <h1>Admin sign in</h1>
+    <h1><?= $setupMode ? 'Create admin account' : 'Admin sign in' ?></h1>
   </div>
   <div class="adm-auth-body">
     <?php if ($message): ?><div class="notice error"><?= e($message) ?></div><?php endif; ?>
+    <?php if ($setupMode): ?>
+    <p class="adm-auth-note">No administrator exists yet. Create the first account to manage the site; you can add more admins later from <strong>Administrators</strong>.</p>
+    <form method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>">
+      <label>Full name<input name="name" required maxlength="120" autocomplete="name" value="<?= e(request_value($_POST, 'name')) ?>"></label>
+      <label>Email<input type="email" name="email" required maxlength="190" autocomplete="username" value="<?= e(request_value($_POST, 'email')) ?>"></label>
+      <label>Password<input type="password" name="password" required minlength="12" maxlength="200" autocomplete="new-password"><small class="muted">At least 12 characters.</small></label>
+      <label>Confirm password<input type="password" name="password_confirm" required minlength="12" maxlength="200" autocomplete="new-password"></label>
+      <button class="button" type="submit">Create account &amp; sign in</button>
+    </form>
+    <?php else: ?>
     <form method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>">
       <label>Email<input type="email" name="email" required autocomplete="username"></label>
       <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
       <button class="button" type="submit">Sign in</button>
     </form>
+    <?php endif; ?>
     <a class="adm-auth-back" href="<?= e(app_url('/')) ?>">&larr; Back to Collegekhoj</a>
   </div>
 </main>

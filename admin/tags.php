@@ -58,7 +58,7 @@ require __DIR__ . '/_nav.php';
 <form method="post"><input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>"><input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= (int) ($edit['id'] ?? 0) ?>">
 <div class="form-grid"><label>Configuration name<input name="name" required value="<?= e($edit['name'] ?? '') ?>"></label>
 <label>Apply to<select name="target_type"><option value="global" <?= ($edit['target_type'] ?? 'global') === 'global' ? 'selected' : '' ?>>All pages</option><option value="page" <?= ($edit['target_type'] ?? '') === 'page' ? 'selected' : '' ?>>One page</option></select></label>
-<label class="full">Page slug (when page-specific)<input name="target_value" value="<?= e($edit['target_value'] ?? '') ?>" placeholder="index, colleges, or CMS page slug"></label>
+<label class="full">Page slug (when page-specific)<input name="target_value" value="<?= e($edit['target_value'] ?? '') ?>" placeholder="index or CMS page slug"></label>
 <label class="full">HTML / JavaScript for &lt;head&gt;<textarea name="head_code" rows="8" spellcheck="false"><?= e($edit['head_code'] ?? '') ?></textarea></label>
 <label class="full">HTML / JavaScript for &lt;body&gt;<textarea name="body_code" rows="8" spellcheck="false"><?= e($edit['body_code'] ?? '') ?></textarea></label></div>
 <label><input type="checkbox" name="is_active" style="width:auto" <?= !isset($edit['is_active']) || $edit['is_active'] ? 'checked' : '' ?>> Active</label>
